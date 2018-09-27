@@ -340,7 +340,11 @@ int main(int argc, char** argv)
 		case '.':
 			if (sModeOn)
 			{
-				if ((tape[tapeI] >= 0 && tape[tapeI] <= 31) || (tape[tapeI] >= 128 && tape[tapeI] <= 255))
+				if (tape[tapeI] == '\\')
+				{
+					fprintf(output, "\\\\", tape[tapeI]);
+				}
+				else if ((tape[tapeI] >= 0 && tape[tapeI] <= 31) || (tape[tapeI] >= 128 && tape[tapeI] <= 255))
 				{
 					fprintf(output, "\\x%x", tape[tapeI]);
 				}
