@@ -1,6 +1,4 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#include "BrainfuckInterpreter.h"
 
 
 
@@ -110,20 +108,34 @@ int bracketCheck(char* prog, int programSize)
 
 
 
+void manual()
+{
+	fprintf(stderr, "\nBrainfuck interpreter 1.0\nInvalid command line format\nCommand line format: ""BrainfuckInterpreter.exe program input output""\n");
+	fprintf(stderr, "Where program - source code in Brainfuck language\ninput - file with input for program\n(if input = '-', then input = standart input stream)\noutput - output program file\n(if output = '-', then output = standart output stream)\n");
+	fprintf(stderr, "Additional options: ""-s"" for text i/o mode\n""-c"" for space symbols and comments mode\n""-d debug"" for debug mode\nwhere debug - output file with debug information\n");
+}
+
+
+
 int main(int argc, char** argv)
 {
 	errno_t err;
 
-	if (argc < 4)
+	if (argc == 1)
+	{
+		manual();
+		return 0;
+	}
+	else if (argc < 4)
 	{
 		fprintf(stderr, "Too few arguments\n");
+		return 0;
 	}
 
 	FILE* programFile;
 	err = fopen_s(&programFile, argv[1], "r");
 	if (err != 0)
 	{
-		printf("%s", argv[1]);
 		fprintf(stderr, "Program file error\n");
 		return 0;
 	}
@@ -342,7 +354,7 @@ int main(int argc, char** argv)
 			{
 				if (tape[tapeI] == '\\')
 				{
-					fprintf(output, "\\\\", tape[tapeI]);
+					fprintf(output, "\\\\");
 				}
 				else if ((tape[tapeI] >= 0 && tape[tapeI] <= 31) || (tape[tapeI] >= 128 && tape[tapeI] <= 255))
 				{
@@ -356,6 +368,11 @@ int main(int argc, char** argv)
 			else
 			{
 				putc(tape[tapeI], output);
+			}
+			if (dModeOn)
+			{
+				fprintf(debug, "%i. . %i:%i:%i\n", step, tapeI, tapeI, tape[tapeI]);
+				step++;
 			}
 			break;
 		case ',':
@@ -424,6 +441,11 @@ int main(int argc, char** argv)
 			else
 			{
 				tape[tapeI] = getc(input);
+			}
+			if (dModeOn)
+			{
+				fprintf(debug, "%i. , %i:%i:%i\n", step, tapeI, tapeI, tape[tapeI]);
+				step++;
 			}
 			break;
 		case '[':
